@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Atendimento - SUS</title>
+    <!-- Adicione os links para as bibliotecas do Bootstrap e Owl Carousel aqui -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    <style>
+        /*Estilizando de modo geral pela raiz*/
+        :root {
+            --sus-blue: #1E4A7B;
+            --sus-light-blue: #2A6BB0;
+            --sus-green: #27AE60;
+            --sus-red: #E74C3C;
+            --sus-yellow: #F39C12;
+
+            /*CORES DO TEXTO*/
+            --sus-texto-claro: #ffffff;
+            --sus-texto-escuro: #333333;
+        }
+        body {
+            background-color: #e0e9f1;
+            font-family: Helvetica, Verdana, Arial, sans-serif;
+            height: 100vh; /*Faz com que o corpo tenha o tamanho da tela*/
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sus-header {
+            position: relative;
+            background: linear-gradient(135deg, var(--sus-blue) 0%, var(--sus-light-blue) 100%); /*colocando degradê*/
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+
+        }
+
+        .sus-logo{
+            position: absolute;
+            left: 65px;
+            transform: translate(-50%);
+            height: 40px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--sus-blue) 10%, var(--sus-light-blue) 100%) !important;
+            color: rgb(255, 254, 254) !important;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Estilo para os números grandes */
+        .ticket-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .current-ticket {
+            font-size: 4.5rem;
+            font-weight: bold;
+            text-align: center;
+            color: var(--sus-red);
+            animation: pulse 1.5s infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .ticket-list {
+            background-color: #c7def8;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #b2d4f7;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .ticket-card {
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 10px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--sus-blue);
+        }
+
+        .ticket-card.preferential {
+            border-left: 5px solid var(--sus-red);
+            background-color: #FFF5F5;
+        }
+
+        .btn-generate {
+            font-size: 1.2rem;
+            padding: 12px 25px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s; /*efeito de transição suave*/
+        }
+
+        .btn-common {
+            background-color: var(--sus-blue);
+            color: white;
+        }
+
+        .btn-preferential {
+            background-color: var(--sus-red);
+            color: white;
+        }
+
+        .btn-attend {
+            font-size: 1.3rem;
+            padding: 15px 30px;
+            background-color: var(--sus-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-generate:hover, .btn-attend:hover {
+            transform: translateY(-2px); /*efeito que escurece ao passar*/
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        } 
+
+        /*Video*/
+        .media-container iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /*redimensiona o tamanho do video*/
+        }
+        .ticket-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--sus-red);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /*--- Data e Hora ---*/
+        #currentDateTime {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            color: rgb(241, 231, 170);
+        }
+
+        #currentDateTime h4 {
+        font-size: 2.3rem; /* Aumenta o tamanho da hora */
+        color: #cde1f7; /* Cor azul do SUS */
+        font-weight: 700;
+        margin: 0;
+        }
+        #currentDateTime p {
+        font-size: 1.2rem; /* Aumenta o tamanho da data */
+        color: rgb(231, 230, 230);
+        margin: 0;
+        }
+
+        /*Cidade e Clima*/
+        #weatherInfo {
+            position: absolute;
+            left: 150px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            color: #ffffff;
+            font-size: 1.2rem;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="sus-header text-center py-3">
+        <img src="img/logo_negativo.png" alt="logo do SUS" class="sus-logo">
+        <h1>Sistema Único de Saúde</h1>
+        <div id="currentDateTime" class="text-center mb-3"></div>
+        <div id="weatherInfo" class="text-center mb-3"></div>
+    </header>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Painel de Entrada das Senhas -->
+            <div class="col-md-4">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h2>Emissão de Senhas</h2>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <button id="generateCommon" class="btn btn-generate btn-common">Senha Comum</button>
+                            <button id="generatePreferential" class="btn btn-generate btn-preferential">Senha Preferencial</button>
+                        </div>
+                        <div class="ticket-list">
+                            <h4 class="text-center">Últimas senhas emitidas:</h4>
+                            <div id="generatedTickets" class="mt-3">
+                                <!-- Senhas geradas serão adicionadas aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vídeo ou Carrossel de Mídia -->
+            <div class="col-md-4">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h2>Informações e Orientações</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="owl-carousel" id="videoCarousel">  
+                                <!-- Adicione cada vídeo como um item do carrossel -->
+                            <div class="item">
+                                <video width="100%" height="200" src="videos/sus1.mp4" autoplay loop muted></video>
+                            </div>
+                            <div class="item">
+                                <video width="100%" height="200" src="videos/sus2.mp4" autoplay loop muted></video>
+                            </div>
+                            <div class="item">
+                                <video width="100%" height="200" src="videos/sus3.mp4" autoplay loop muted></video>
+                            </div>
+                            <div class="item">
+                                <video width="100%" height="200" src="videos/sus4.mp4" autoplay loop muted></video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de Atendimento das Senhas -->
+            <div class="col-md-4">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h2>Atendimento</h2>
+                    </div>
+                    <div class="card-body text-center">
+                        <button id="attendTicket" class="btn btn-attend mb-4">Chamar Próxima Senha</button>
+                        <div class="ticket-list">
+                            <h4 class="text-center">Últimas senhas chamadas:</h4>
+                            <div id="attendedTickets" class="mt-3">
+                                <!-- Senhas atendidas serão adicionadas aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel Atual (quem acabou de chegar e quem está sendo atendido) -->
+        <div class="row mt-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Painel Atual</h2>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="text-center">Última senha emitida:</h3>
+                                <div id="lastGenerated" class="ticket-number">---</div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="text-center">Senha em atendimento:</h3>
+                                <div id="currentTicket" class="current-ticket">---</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts do Bootstrap, jQuery, Popper.js e Owl Carousel -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+    <script>
+        // Variáveis globais
+        let commonCounter = 100;
+        let preferentialCounter = 100;
+        let commonTickets = [];
+        let preferentialTickets = [];
+        let attendedTickets = [];
+        const maxDisplayedTickets = 2;
+        const synth = window.speechSynthesis;
+        let utterance = new SpeechSynthesisUtterance();
+        
+    
+
+        $(document).ready(function() {
+            // Inicializa o carrossel
+            $("#videoCarousel").owlCarousel({
+                items: 1,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 10000,
+                autoplayHoverPause: true,
+                nav: false,
+                dots: true,
+            });
+
+            // Inicializa as funções de hora e clima
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            fetchWeather();
+            setInterval(fetchWeather, 600000);
+        });
+
+        // Gerar senha Comum
+        $('#generateCommon').click(function() {
+            const newTicket = 'C' + commonCounter++;
+            commonTickets.push(newTicket);
+            $('#lastGenerated').text(newTicket);
+            // Atualiza a lista de senhas geradas
+            updateGeneratedTicketsDisplay();
+        });
+
+        // Gerar senha Preferencial
+        $('#generatePreferential').click(function() {
+            const newTicket = 'P' + preferentialCounter++;
+            preferentialTickets.unshift(newTicket);
+            $('#lastGenerated').text(newTicket);
+            // Atualiza a lista de senhas geradas
+            updateGeneratedTicketsDisplay();
+        });
+
+        // Atender próxima senha
+        $('#attendTicket').click(function() {
+            let nextTicket = null;
+            // Lógica de Prioridade: Tenta atender preferencial primeiro
+            if (preferentialTickets.length > 0) {
+                nextTicket = preferentialTickets.shift();
+            } else if (commonTickets.length > 0) {
+                nextTicket = commonTickets.shift();
+            }
+
+            if (nextTicket) {
+                attendedTickets.unshift(nextTicket); // Adiciona ao início da lista de atendidos
+                $('#currentTicket').text(nextTicket);
+                // Adiciona a chamada de voz
+                speakTicket(nextTicket);
+                // Atualiza as listas de senhas
+                updateGeneratedTicketsDisplay();
+                updateAttendedTicketsDisplay();
+                if (commonTickets.length === 0 && preferentialTickets.length === 0) {
+                    $('#lastGenerated').text('---');
+                }
+            } else {
+                alert('Não há senhas para atender!');
+            }
+        });
+
+        // --- FUNÇÕES DE VOZ, HORA E CLIMA ---
+
+        function speakTicket(ticket) {
+            const ticketType = ticket.startsWith('P') ? 'Preferencial' : 'Comum';
+            const ticketNumber = ticket.substring(1).split('').join(' ');
+            const textToSpeak = `Senha ${ticketType}, número ${ticketNumber}. Dirija-se a recepção.`;
+            
+            utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 0.9;
+            utterance.volume = 1.0; //altura da voz
+
+            const voices = synth.getVoices();
+            const ptVoice = voices.find(voice => voice.lang === 'pt-BR');
+            if (ptVoice) {
+                utterance.voice = ptVoice;
+            }
+
+            synth.speak(utterance);
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const dateString = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+            $('#currentDateTime').html(`
+                <p class="mb-0"><strong>${dateString}</strong></p>
+                <h4 class="mb-0">${timeString}</h4>
+            `);
+        }
+
+        function fetchWeather() {
+            const latitude = -23.5505;
+            const longitude = -46.6333;
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=America%2FSao_Paulo`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.current_weather) {
+                        const temp = data.current_weather.temperature;
+                        const windspeed = data.current_weather.windspeed;
+                        $('#weatherInfo').html(`
+                            <p><strong>São Paulo</strong></p>
+                            <p class="mb-0"><strong>${temp}°C</strong></p>
+                        `);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar o clima:', error);
+                    $('#weatherInfo').html('<p class="mb-0">Clima indisponível</p>');
+                });
+        }
+
+        // --- FUNÇÕES DE EXIBIÇÃO ---
+
+        // Atualiza a exibição das senhas geradas
+        function updateGeneratedTicketsDisplay() {
+            const displayElement = $('#generatedTickets');
+            displayElement.empty();
+            const allTickets = [...preferentialTickets, ...commonTickets];
+            // Mostra apenas as últimas 2 senhas
+            const ticketsToShow = allTickets.slice(0, maxDisplayedTickets);
+            ticketsToShow.forEach(ticket => {
+                const isPreferential = ticket.startsWith('P');
+                const badge = isPreferential ? `<span class="ticket-badge">P</span>` : '';
+                displayElement.append(`
+                    <div class="ticket-card ${isPreferential ? 'preferential' : ''} position-relative">
+                        ${badge}
+                        <div class="ticket-number">${ticket}</div>
+                    </div>
+                `);
+            });
+        }
+
+        // Atualiza a exibição das senhas atendidas
+        function updateAttendedTicketsDisplay() {
+            const displayElement = $('#attendedTickets');
+            displayElement.empty();
+            // Mostra apenas as últimas 2 senhas atendidas
+            const ticketsToShow = attendedTickets.slice(0, maxDisplayedTickets);
+            ticketsToShow.forEach(ticket => {
+                const isPreferential = ticket.startsWith('P');
+                displayElement.append(`
+                    <div class="ticket-card ${isPreferential ? 'preferential' : ''}">
+                        <div class="ticket-number">${ticket}</div>
+                    </div>
+                `);
+            });
+        }
+    </script>
+</body>
+</html>
